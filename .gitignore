@@ -1,0 +1,4 @@
+*.env
+.env.production
+*.zip
+node_modules
