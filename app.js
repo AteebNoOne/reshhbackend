@@ -3,7 +3,12 @@ const cors = require('cors');
 const contactController = require('./contact/contact.controller')
 const bodyParser = require('body-parser');
 const app = express();
-const port = 4001;
+
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const port = process.env.PORT || 4001;
 
 app.use(cors());
 app.use(express.json());
