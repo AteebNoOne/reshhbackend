@@ -20,7 +20,7 @@ async function formatDate(dateString) {
 
 
 
-async function submitQuote(firstName, lastName, email, phone, notes, additionalGuests, dates) {
+async function submitQuote(venue,firstName, lastName, email, phone, notes, additionalGuests, dates) {
   const start = await formatDate(dates.startDate);
   const end = await formatDate(dates.endDate);
 
@@ -90,7 +90,7 @@ async function submitQuote(firstName, lastName, email, phone, notes, additionalG
         
         <div class="container">
   <img class="logoImage" width="100" height="100" src="https://reshhproperties.designolance.com/wp-content/uploads/2024/02/PNG-01-1536x1485.png" alt="Reshh Properties Logo" />
-
+  <h3>Venue: ${venue} </h2>
   <p>First Name: ${firstName}</p>
   <p>Last Name: ${lastName}</p>
          <p>Email: ${email}</p>
@@ -116,7 +116,7 @@ async function submitQuote(firstName, lastName, email, phone, notes, additionalG
 }
 
 
-async function informClient(email) {
+async function informClient(email,data) {
   let transporter = nodemailer.createTransport({
     host: process.env.ReshhEmailHost,
     port: process.env.ReshhEmailPort,
@@ -188,6 +188,7 @@ async function informClient(email) {
   <p>Best regards,</p>
   <p>Reshh Properties Team</p>
 
+  
 
 
   <p class="disclaimer">This is a system-generated email and replies to this address are not monitored. Please don't reply to this message. For any inquiries, contact us at <a href="mailto:${process.env.ReshhEmailTo}">${process.env.ReshhEmailTo}</a>.</p>

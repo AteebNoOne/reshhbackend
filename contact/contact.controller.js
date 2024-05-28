@@ -4,12 +4,12 @@ const contactServices = require('./contact.service');
 
 
 router.post('/', async (req, res) => {
-    const { firstName, lastName,email, phone,notes,additionalGuests,dates } = req.body;
+    const { venue,firstName, lastName,email, phone,notes,additionalGuests,dates } = req.body;
     try {
-        if (!firstName && !lastName && !email && !phone,!dates) {
+        if (!venue && !firstName && !lastName && !email && !phone,!dates) {
             return res.status(400).json({ message: "FirstName, LastName,Email, Phone, and Dates are required" });
         }
-        const formSubmission = await contactServices.submitQuote(firstName, lastName,email, phone,notes,additionalGuests,dates );
+        const formSubmission = await contactServices.submitQuote(venue,firstName, lastName,email, phone,notes,additionalGuests,dates );
         if(formSubmission === "Booking Request submitted successfully!"){
           try{
            const client= await contactServices.informClient(email)
