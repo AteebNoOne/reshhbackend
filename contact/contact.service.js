@@ -9,10 +9,6 @@ async function formatDate(dateString) {
 
   const date = new Date(dateString);
 
-  const date = new Date(dateString);
-
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -23,29 +19,14 @@ async function formatDate(dateString) {
 
   return dayName + " " + dayNumber + " " + month + " " + year
 }
-  const dayName = days[date.getDay()];
-  const dayNumber = date.getDate();
-  const month = months[date.getMonth()];
-  const year = date.getFullYear();
-
-  return dayName + " " + dayNumber + " " + month + " " + year
-}
-
+  
 
 
 async function submitQuote(venue, firstName, lastName, email, phone, notes, additionalGuests, dates) {
   const start = await formatDate(dates.startDate);
   const end = await formatDate(dates.endDate);
 
-  let transporter = nodemailer.createTransport({
-    host: process.env.ReshhEmailHost,
-    port: process.env.ReshhEmailPort,
-    secure: process.env.ReshhEmailSecured,
-    auth: {
-      user: process.env.ReshhEmailUser,
-      pass: process.env.ReshhEmailPass
-    }
-  });
+
   let transporter = nodemailer.createTransport({
     host: process.env.ReshhEmailHost,
     port: process.env.ReshhEmailPort,
@@ -147,11 +128,6 @@ async function informClient(email, bookingId) {
     }
   });
 
-  let mailOptions = {
-    from: `"Reshh Properties" <${process.env.ReshhEmailUser}>`,
-    to: email,
-    subject: "Booking Request Confirmation",
-    html: `
   let mailOptions = {
     from: `"Reshh Properties" <${process.env.ReshhEmailUser}>`,
     to: email,
@@ -310,25 +286,18 @@ async function informClientAboutCancel(email, data) {
 
         `,
   };
+  try {
+    let info = await transporter.sendMail(mailOptions);
+    console.log("Confirmation email sent: %s", info.messageId);
+    return "Confirmation email sent successfully!";
+  } catch (err) {
+    console.error("Confirmation email sending error:", err);
+    throw new Error("Failed to send confirmation email. Please try again later.");
+  }
   };
 
-  try {
-    let info = await transporter.sendMail(mailOptions);
-    console.log("Confirmation email sent: %s", info.messageId);
-    return "Confirmation email sent successfully!";
-  } catch (err) {
-    console.error("Confirmation email sending error:", err);
-    throw new Error("Failed to send confirmation email. Please try again later.");
-  }
-  try {
-    let info = await transporter.sendMail(mailOptions);
-    console.log("Confirmation email sent: %s", info.messageId);
-    return "Confirmation email sent successfully!";
-  } catch (err) {
-    console.error("Confirmation email sending error:", err);
-    throw new Error("Failed to send confirmation email. Please try again later.");
-  }
-}
+
+
 
 
 async function verifyBookingId(bookingId) {

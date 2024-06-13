@@ -1,56 +1,45 @@
 const express = require('express');
 const cors = require('cors');
-const contactController = require('./contact/contact.controller')
 const bodyParser = require('body-parser');
-const app = express();
 const path = require('path');
 const dotenv = require('dotenv');
-const { getAllUsedDates } = require('./functions/getAllUsedDates');
-const db = require('./contact/contact.db');
+const contactController = require('./contact/contact.controller');
 
 dotenv.config();
 
+const app = express();
 const port = process.env.PORT || 4001;
 
-app.use(cors());
+// Middleware setup
+app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use(express.static(path.join(__dirname, 'dist')));
+// Set Content Security Policy (CSP)
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://reshhproperties.com");
+  next();
+});
 
+// API routes
 app.use('/api/booking', contactController);
 
-// Catch-all route to serve index.html for all other routes
+// Serve static files from 'dist' folder
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Serve index.html for all other routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-// Middleware to set the Content-Security-Policy header
-app.use((req, res, next) => {
-  res.setHeader(
-    "Content-Security-Policy",
-    "frame-ancestors 'self' https://reshhproperties.com"
-  );
-  next();
-});
-
-
-// Middleware to set the X-Frame-Options header
-app.use((req, res, next) => {
-  res.setHeader('X-Frame-Options', 'ALLOW-FROM https://reshhproperties.com');
-  next();
-});
-
-
+// Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Internal Server Error');
 });
 
+// Start server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}.`);
 });
-
-
-
