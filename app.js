@@ -26,6 +26,20 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
+// Middleware to set the Content-Security-Policy header
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "frame-ancestors 'self' https://reshhproperties.com"
+  );
+  next();
+});
+
+// Middleware to set the X-Frame-Options header
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'ALLOW-FROM https://reshhproperties.com');
+  next();
+});
 
 
 app.use((err, req, res, next) => {
