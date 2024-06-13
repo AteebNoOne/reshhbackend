@@ -35,6 +35,7 @@ app.use((req, res, next) => {
   next();
 });
 
+
 // Middleware to set the X-Frame-Options header
 app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'ALLOW-FROM https://reshhproperties.com');
