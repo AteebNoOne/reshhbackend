@@ -110,7 +110,7 @@ async function submitQuote(venue, firstName, lastName, email, phone, notes, addi
     return "Booking Request submitted successfully!"
   } catch (err) {
     console.error("Email sending error:", err);
-
+    
     throw new Error("Failed to submit quote. Please try again later.");
   }
 }
@@ -132,7 +132,52 @@ async function informClient(email, bookingId) {
     to: email,
     subject: "Booking Request Confirmation",
     html: `
-     ${await getStyles()}
+        <style>
+
+  .container {
+    padding: 20px;
+    background-color: #f5f5f5; /* Light gray background for content */
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); 
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #fff; 
+  }
+
+
+  h2 {
+    color: #333; /* Dark gray for headings */
+    margin: 10px 0;
+  }
+
+  p {
+    color: #666; /* Light gray for text */
+    line-height: 1.5;
+  }
+
+  .disclaimer {
+    font-size: smaller;
+    color: #999; /* Even lighter gray for disclaimer */
+    text-align: center;
+    margin-top: 20px;
+  }
+
+
+  a {
+    color: #3b82f6; /* Blue-300 color for links */
+    text-decoration: none; /* Remove underline from links */
+  }
+
+
+  a:hover {
+    text-decoration: underline; /* Underline link on hover */
+  }
+
+  .logoImage{
+    width:100px;
+    height:100px;
+  }
+</style>
 
 <div class="container">
   <img class="logoImage" width="100" height="100" src="https://reshhproperties.designolance.com/wp-content/uploads/2024/02/PNG-01-1536x1485.png" alt="Reshh Properties Logo" />
@@ -180,7 +225,53 @@ async function informClientAboutCancel(email, data) {
     to: email,
     subject: "Booking Cancelled",
     html: `
- ${await getStyles()}
+        <style>
+
+  .container {
+    padding: 20px;
+    background-color: #f5f5f5; /* Light gray background for content */
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); 
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #fff; 
+  }
+
+
+  h2 {
+    color: #333; /* Dark gray for headings */
+    margin: 10px 0;
+  }
+
+  p {
+    color: #666; /* Light gray for text */
+    line-height: 1.5;
+  }
+
+  .disclaimer {
+    font-size: smaller;
+    color: #999; /* Even lighter gray for disclaimer */
+    text-align: center;
+    margin-top: 20px;
+  }
+
+
+  a {
+    color: #3b82f6; /* Blue-300 color for links */
+    text-decoration: none; /* Remove underline from links */
+  }
+
+
+  a:hover {
+    text-decoration: underline; /* Underline link on hover */
+  }
+
+  .logoImage{
+    width:100px;
+    height:100px;
+  }
+</style>
+
 <div class="container">
   <img class="logoImage" width="100" height="100" src="https://reshhproperties.designolance.com/wp-content/uploads/2024/02/PNG-01-1536x1485.png" alt="Reshh Properties Logo" />
 
@@ -203,8 +294,7 @@ async function informClientAboutCancel(email, data) {
     console.error("Confirmation email sending error:", err);
     throw new Error("Failed to send confirmation email. Please try again later.");
   }
-};
-
+}
 
 
 async function verifyBookingId(bookingId) {
@@ -264,5 +354,5 @@ async function sendOtp(otp, email) {
 }
 
 module.exports = {
-  submitQuote, informClient, verifyBookingId, sendOtp, informClientAboutCancel
+  submitQuote, informClient, verifyBookingId, sendOtp,informClientAboutCancel
 };
