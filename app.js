@@ -1,18 +1,42 @@
 const express = require('express');
 const cors = require('cors');
-const contactController = require('./contact/contact.controller')
+const helmet = require('helmet');
+const contactController = require('./contact/contact.controller');
 const bodyParser = require('body-parser');
 const app = express();
 const path = require('path');
 const dotenv = require('dotenv');
-const { getAllUsedDates } = require('./functions/getAllUsedDates');
 const db = require('./contact/contact.db');
 
 dotenv.config();
 
 const port = process.env.PORT || 4001;
 
-app.use(cors());
+// Use helmet to secure the app by setting various HTTP headers
+app.use(helmet());
+
+// Custom helmet configuration to allow framing from specific origins
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    frameAncestors: ["'self'", "https://www.reshhproperties.com"]
+  }
+}));
+
+// CORS configuration to allow specific origins
+const allowedOrigins = ['https://www.reshhproperties.com', 'http://localhost:3000']; // Add your allowed origins here
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+}));
+
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -26,23 +50,6 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-// Middleware to set the Content-Security-Policy header
-app.use((req, res, next) => {
-  res.setHeader(
-    "Content-Security-Policy",
-    "frame-ancestors 'self' https://reshhproperties.com"
-  );
-  next();
-});
-
-
-// Middleware to set the X-Frame-Options header
-app.use((req, res, next) => {
-  res.setHeader('X-Frame-Options', 'ALLOW-FROM https://reshhproperties.com');
-  next();
-});
-
-
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Internal Server Error');
@@ -51,6 +58,3 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}.`);
 });
-
-
-
