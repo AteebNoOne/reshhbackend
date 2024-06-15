@@ -11,13 +11,13 @@ router.post('/', async (req, res) => {
   const { venue, firstName, lastName, email, phone, notes, additionalGuests, dates } = req.body;
   const bookingId = await generateBookingId()
   let venueCode = null;
-  if (venue === 'Beach Cottage') {
+  if (venue === 'The Beach Cottage') {
     venueCode = 'the-beach-cottage'
   }
-  if (venue === 'Retreat') {
+  if (venue === 'The Retreat') {
     venueCode = 'the-retreat'
   }
-  if (venue === 'Oasis') {
+  if (venue === 'The Oasis') {
     venueCode = 'the-oasis'
   }
   const bookingData = { venue, venueCode, bookingId, firstName, lastName, email, phone, notes, additionalGuests, dates }
@@ -27,16 +27,16 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: "Venue,FirstName, LastName,Email, Phone, and Dates are required" });
     }
     const postInDb = await db.Booking.create(bookingData)
-    const formSubmission = await contactServices.submitQuote(venue, firstName, lastName, email, phone, notes, additionalGuests, dates);
-    if (formSubmission === "Booking Request submitted successfully!") {
-      try {
-        const client = await contactServices.informClient(email,bookingId)
-      }
-      catch (error) {
-        console.log("Error informing client", error)
-      }
-    }
-    res.status(200).json({ message: formSubmission, success: true });
+    // const formSubmission = await contactServices.submitQuote(venue, firstName, lastName, email, phone, notes, additionalGuests, dates);
+    // if (formSubmission === "Booking Request submitted successfully!") {
+    //   try {
+    //     const client = await contactServices.informClient(email,bookingId)
+    //   }
+    //   catch (error) {
+    //     console.log("Error informing client", error)
+    //   }
+    // }
+    res.status(200).json({ message: postInDb, success: true });
   }
   catch (err) {
     console.error(err);
@@ -44,6 +44,17 @@ router.post('/', async (req, res) => {
   }
 });
 
+
+router.get('/', async (req, res) => {
+  try {
+    const bookings = await db.Booking.getAll()
+    res.status(200).json({ message: "success", success: true, data: bookings });
+  }
+  catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error', message: err.message });
+  }
+});
 
 router.get('/used-dates', async (req, res) => {
   const { venue } = req.query;
@@ -56,6 +67,32 @@ router.get('/used-dates', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error', message: err.message });
   }
 });
+
+router.get('/prices', async (req, res) => {
+  try {
+    const prices = await db.Prices.getAll()
+    res.status(200).json({ message: "success", success: true, data: prices });
+  }
+  catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error', message: err.message });
+  }
+});
+
+
+router.put('/prices', async (req, res) => {
+  const {id,venue,nightPrice,cleaningFee,managementFee,adminFee,maxGuests} = req.body;
+  const updatedData = {venue,nightPrice,cleaningFee,managementFee,adminFee,maxGuests}
+  try {
+    const prices = await db.Prices.updatePriceById(id,updatedData)
+    res.status(200).json({ message: "success", success: true, data: prices });
+  }
+  catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error', message: err.message });
+  }
+});
+
 
 router.get('/verify-bookingId', async (req, res) => {
   const { bookingId } = req.query;
@@ -72,6 +109,18 @@ router.get('/verify-bookingId', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error', message: err.message });
   }
 });
+
+router.post('/delete-booking', async (req, res) => {
+  const { bookingId } = req.body;
+  try {
+    const delREs = await db.Booking.delete(bookingId)
+    res.status(200).json({ message: delREs, success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error', message: err.message });
+  }
+});
+
 
 router.post('/cancel-booking', async (req, res) => {
   const { bookingId, email } = req.body;
@@ -95,7 +144,6 @@ router.post('/cancel-booking', async (req, res) => {
 router.post('/verify-otp', async (req, res) => {
   const { bookingId, email, otp } = req.body;
   const data = await db.Booking.getById(bookingId)
-  console.log("DATA: ",data)
   try {
     const result = await db.Booking.verifyOtp(bookingId, email, otp)
     if (result.length > 0) {

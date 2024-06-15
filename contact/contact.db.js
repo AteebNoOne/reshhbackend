@@ -1,49 +1,25 @@
 const util = require('util');
 const pool = require('../_helpers/db.config');
+const { createPricesTable, createBookingTable, createUserTable } = require('../functions/createTables');
 
-function createBookingTable() {
-    const createBookingTableQuery = `
-        CREATE TABLE IF NOT EXISTS bookings (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            bookingId VARCHAR(255) UNIQUE,
-            venue VARCHAR(255),
-            venueCode VARCHAR(255),
-            firstName VARCHAR(255),
-            lastName VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL,
-            phone VARCHAR(255) NOT NULL,
-            notes VARCHAR(255),
-            additionalGuests VARCHAR(255),
-            otp VARCHAR(6) DEFAULT NULL,
-            dates JSON,
-            createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    `;
-
-    pool.query(createBookingTableQuery, (err, result) => {
-        if (err) {
-            console.error('Error creating table:', err);
-        } else {
-            console.log('Table "Bookings" has been created successfully.');
-        }
-    });
-}
-
+createUserTable();
+createPricesTable();
 createBookingTable();
+
 
 const db = {
     Booking: {
         create: async (bookingData) => {
-            const { bookingId, venue,venueCode,firstName, lastName, email, phone, notes, additionalGuests, dates } = bookingData;
+            const { bookingId, venue, venueCode, firstName, lastName, email, phone, notes, additionalGuests, dates } = bookingData;
             const query = 'INSERT INTO bookings (bookingId, venue,venueCode,firstName, lastName, email, phone, notes, additionalGuests, dates) VALUES (?, ?, ?,?, ?, ?, ?, ?, ?,?)';
             const queryAsync = util.promisify(pool.query).bind(pool);
             try {
-                const result = await queryAsync(query, [bookingId,venue,venueCode, firstName, lastName, email, phone, notes, additionalGuests, JSON.stringify(dates)]);
+                const result = await queryAsync(query, [bookingId, venue, venueCode, firstName, lastName, email, phone, notes, additionalGuests, JSON.stringify(dates)]);
                 return result;
             } catch (error) {
                 return error;
             }
-        },        
+        },
         delete: async (bookingId) => {
             const query = 'DELETE FROM bookings WHERE bookingId = ?';
             const queryAsync = util.promisify(pool.query).bind(pool);
@@ -108,16 +84,16 @@ const db = {
                 return error;
             }
         },
-        setOtp: async (otp,bookingId) => {
+        setOtp: async (otp, bookingId) => {
             const query = 'UPDATE bookings SET otp = ? WHERE bookingId = ?';
             const queryAsync = util.promisify(pool.query).bind(pool);
             try {
-                const result = await queryAsync(query, [otp,bookingId]);
+                const result = await queryAsync(query, [otp, bookingId]);
                 return result;
             } catch (error) {
                 return error;
             }
-        }, 
+        },
         getOtp: async (email) => {
             const query = 'SELECT otp FROM bookings WHERE  email = ?';
             const queryAsync = util.promisify(pool.query).bind(pool);
@@ -128,17 +104,76 @@ const db = {
                 return error;
             }
         },
-        verifyOtp: async (bookingId,email,otp) => {
+        verifyOtp: async (bookingId, email, otp) => {
             const query = 'SELECT * FROM bookings WHERE bookingId = ? AND email = ? AND otp = ?';
             const queryAsync = util.promisify(pool.query).bind(pool);
             try {
-                const result = await queryAsync(query, [bookingId,email,otp]);
+                const result = await queryAsync(query, [bookingId, email, otp]);
                 return result;
             } catch (error) {
                 return error;
             }
-        }          
+        }
     },
+    Prices: {
+        getAll: async () => {
+            const query = 'SELECT * FROM prices';
+            const queryAsync = util.promisify(pool.query).bind(pool);
+            try {
+                const result = await queryAsync(query);
+                return result;
+            } catch (error) {
+                return error;
+            }
+        },
+        updatePriceById: async (id, updatedData) => {
+            const queryAsync = util.promisify(pool.query).bind(pool);
+            const { nightPrice, cleaningFee, managementFee, adminFee, maxGuests } = updatedData;
+            // console.log("Updating...",id,updatedData)
+            const query = `
+                UPDATE prices 
+                SET nightPrice = ?, cleaningFee = ?, managementFee = ?, adminFee = ?, maxGuests = ?
+                WHERE id = ?
+            `;
+            try {
+                const result = await queryAsync(query, [nightPrice, cleaningFee, managementFee, adminFee, maxGuests, id]);
+                console.log("Update res?", result)
+                return result;
+            } catch (error) {
+                console.log("ERROR?", error)
+                return error;
+            }
+        }
+    },
+    User: {
+        findByEmail: async (email) => {
+            const query = 'SELECT * FROM users WHERE email = ?';
+            const queryAsync = util.promisify(pool.query).bind(pool);
+            try {
+                const results = await queryAsync(query, [email]);
+                return results.length > 0 ? results[0] : null; // Return the user object or null if not found
+            } catch (error) {
+                console.error('Database error:', error);
+                throw error;
+            }
+        },
+        updatePassword: async (userId, newPassword) => {
+            try {
+                // Hash the new password
+                const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+                // Update password in database
+                const query = 'UPDATE users SET password = ? WHERE id = ?';
+                const queryAsync = util.promisify(pool.query).bind(pool);
+                await queryAsync(query, [hashedPassword, userId]);
+
+                return { message: 'Password updated successfully.' };
+            } catch (error) {
+                console.error('Database error:', error);
+                throw error;
+            }
+        }
+    }
 };
 
 module.exports = db;

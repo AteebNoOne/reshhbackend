@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const dotenv = require('dotenv');
 const contactController = require('./contact/contact.controller');
+const adminController = require('./admin/admin.controller');
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 
 // API routes
 app.use('/api/booking', contactController);
+app.use('/api/master', adminController);
 
 // Serve static files from 'dist' folder
 app.use(express.static(path.join(__dirname, 'dist')));
