@@ -96,9 +96,7 @@ async function informClient(email, bookingId) {
   <p>Dear ${email},</p>
   <p>Thank you for requesting a booking from Reshh Properties. Your request has been successfully received.</p>
   <p>We will review your request and get back to you as soon as possible.</p>
-  <p>If it was a mistake, you can cancel your booking anytime</p>
-<p>To cancel your reservation, please visit <a href='https://bookings.reshhproperties.com/cancel?id=${bookingId}' target='_blank'>Cancel Now</a></p>
-  <p>Best regards,</p>
+ <p>Best regards,</p>
   <p>Reshh Properties Team</p>
 
   
@@ -224,3 +222,7 @@ async function sendOtp(otp, email) {
 module.exports = {
   submitQuote, informClient, verifyBookingId, sendOtp,informClientAboutCancel
 };
+
+{/* <p>If it was a mistake, you can cancel your booking anytime</p>
+<p>To cancel your reservation, please visit <a href='https://bookings.reshhproperties.com/cancel?id=${bookingId}' target='_blank'>Cancel Now</a></p>
+  */}

@@ -27,15 +27,15 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: "Venue,FirstName, LastName,Email, Phone, and Dates are required" });
     }
     const postInDb = await db.Booking.create(bookingData)
-    // const formSubmission = await contactServices.submitQuote(venue, firstName, lastName, email, phone, notes, additionalGuests, dates);
-    // if (formSubmission === "Booking Request submitted successfully!") {
-    //   try {
-    //     const client = await contactServices.informClient(email,bookingId)
-    //   }
-    //   catch (error) {
-    //     console.log("Error informing client", error)
-    //   }
-    // }
+    const formSubmission = await contactServices.submitQuote(venue, firstName, lastName, email, phone, notes, additionalGuests, dates);
+    if (formSubmission === "Booking Request submitted successfully!") {
+      try {
+        const client = await contactServices.informClient(email,bookingId)
+      }
+      catch (error) {
+        console.log("Error informing client", error)
+      }
+    }
     res.status(200).json({ message: postInDb, success: true });
   }
   catch (err) {

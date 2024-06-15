@@ -104,7 +104,7 @@ function insertSampleRecords() {
 }
 
 function insertUser() {
-    const email = 'ateebnoone@gmail.com';
+    const email = 'reshhproperties@yahoo.com';
     const password = 'Res$h*2*2';
 
     // Hash password using bcrypt
