@@ -22,10 +22,9 @@ async function formatDate(dateString) {
   
 
 
-async function submitQuote(venue, firstName, lastName, email, phone, notes, additionalGuests, dates) {
+async function submitQuote(venue, firstName, lastName, email, phone, notes, additionalGuests, dates,emailReceipt,req) {
   const start = await formatDate(dates.startDate);
   const end = await formatDate(dates.endDate);
-
 
   let transporter = nodemailer.createTransport({
     host: process.env.ReshhEmailHost,
@@ -36,7 +35,6 @@ async function submitQuote(venue, firstName, lastName, email, phone, notes, addi
       pass: process.env.ReshhEmailPass
     }
   });
-
 
 
   let mailOptions = {
@@ -57,6 +55,7 @@ async function submitQuote(venue, firstName, lastName, email, phone, notes, addi
          <p>Message: ${notes}</p>
          <p>Start date: ${start} </p>
          <p>End date: ${end}</p>
+         ${emailReceipt}
 </div>`
   };
 
@@ -72,7 +71,10 @@ async function submitQuote(venue, firstName, lastName, email, phone, notes, addi
 }
 
 
-async function informClient(email, bookingId) {
+async function informClient(email, bookingId,req) {
+    // Construct iframe URL
+    let iframeUrl = `${req.protocol}://${req.get('host')}/reshhsummary/receipts/${bookingId}`;
+
   let transporter = nodemailer.createTransport({
     host: process.env.ReshhEmailHost,
     port: process.env.ReshhEmailPort,
@@ -98,7 +100,7 @@ async function informClient(email, bookingId) {
   <p>We will review your request and get back to you as soon as possible.</p>
  <p>Best regards,</p>
   <p>Reshh Properties Team</p>
-
+    <a href=${iframeUrl}>Click here to see receipt</a>
   
 
 

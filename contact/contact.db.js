@@ -10,11 +10,11 @@ createBookingTable();
 const db = {
     Booking: {
         create: async (bookingData) => {
-            const { bookingId, venue, venueCode, firstName, lastName, email, phone, notes, additionalGuests, dates } = bookingData;
-            const query = 'INSERT INTO bookings (bookingId, venue,venueCode,firstName, lastName, email, phone, notes, additionalGuests, dates) VALUES (?, ?, ?,?, ?, ?, ?, ?, ?,?)';
+            const { bookingId, venue, venueCode, firstName, lastName, email, phone, notes, additionalGuests, dates,receipt } = bookingData;
+            const query = 'INSERT INTO bookings (bookingId, venue,venueCode,firstName, lastName, email, phone, notes, additionalGuests, dates,receipt) VALUES (?, ?, ?,?, ?, ?, ?, ?, ?,?,?)';
             const queryAsync = util.promisify(pool.query).bind(pool);
             try {
-                const result = await queryAsync(query, [bookingId, venue, venueCode, firstName, lastName, email, phone, notes, additionalGuests, JSON.stringify(dates)]);
+                const result = await queryAsync(query, [bookingId, venue, venueCode, firstName, lastName, email, phone, notes, additionalGuests, JSON.stringify(dates),JSON.stringify(receipt)]);
                 return result;
             } catch (error) {
                 return error;

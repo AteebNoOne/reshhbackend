@@ -5,10 +5,11 @@ const db = require('./contact.db');
 const { getAllUsedDates } = require('../functions/getAllUsedDates');
 const generateBookingId = require('../functions/generateRandomString');
 const generateOtp = require('../functions/generateOtp');
+const { createReceipt } = require('../functions/createReceipt');
 
 
 router.post('/', async (req, res) => {
-  const { venue, firstName, lastName, email, phone, notes, additionalGuests, dates } = req.body;
+  const { venue, firstName, lastName, email, phone, notes, additionalGuests, dates,receipt } = req.body;
   const bookingId = await generateBookingId()
   let venueCode = null;
   if (venue === 'The Beach Cottage') {
@@ -20,17 +21,18 @@ router.post('/', async (req, res) => {
   if (venue === 'The Oasis') {
     venueCode = 'the-oasis'
   }
-  const bookingData = { venue, venueCode, bookingId, firstName, lastName, email, phone, notes, additionalGuests, dates }
+  const bookingData = { venue, venueCode, bookingId, firstName, lastName, email, phone, notes, additionalGuests, dates,receipt }
   try {
 
     if (!venue && !firstName && !lastName && !email && !phone, !dates) {
       return res.status(400).json({ message: "Venue,FirstName, LastName,Email, Phone, and Dates are required" });
     }
     const postInDb = await db.Booking.create(bookingData)
-    const formSubmission = await contactServices.submitQuote(venue, firstName, lastName, email, phone, notes, additionalGuests, dates);
+    const emailReceipt = await createReceipt(bookingId,receipt);
+    const formSubmission = await contactServices.submitQuote(venue, firstName, lastName, email, phone, notes, additionalGuests, dates,emailReceipt,req);
     if (formSubmission === "Booking Request submitted successfully!") {
       try {
-        const client = await contactServices.informClient(email,bookingId)
+        const client = await contactServices.informClient(email,bookingId,req)
       }
       catch (error) {
         console.log("Error informing client", error)

@@ -16,6 +16,7 @@ function createBookingTable() {
             additionalGuests VARCHAR(255),
             otp VARCHAR(6) DEFAULT NULL,
             dates JSON,
+            receipt JSON,
             createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     `;
